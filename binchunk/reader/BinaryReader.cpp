@@ -1,5 +1,23 @@
 #include "BinaryReader.h"
-#include "../BinaryChunk.h"
+
+//chunk文件头部的签名常量
+const std::string LUA_SIGNATURE("\x1bLua");
+//...的版本号
+byte LUAC_VERSION = 0x53;
+//...的格式号
+byte LUAC_FORMAT = 0x00;
+
+const std::string LUAC_DATA("\x19\x93\r\n\x1a\n");
+
+byte CINT_SIZE = 4;
+byte INSTRUCTION_SIZE = 4;
+byte CSIZET_SIZE = 8;
+byte LUA_INTEGER_SIZE = 8;
+byte LUA_NUMBER_SIZE = 8;
+
+uint32 LUAC_INT = 0x5678;
+const double LUAC_NUM = 370.5;
+
 
 byte BinaryReader::readByte () {
     byte b = bytes[pos];
@@ -15,7 +33,7 @@ std::vector<byte> BinaryReader::readBytes (const int &len) {
 
 
 uint32 BinaryReader::readUint32 () {
-    std::vector<byte> vec = readBytes(8);
+    std::vector<byte> vec = readBytes(4);
     auto e = vec.begin();
     for (; e != vec.end(); ++e) {
         if (*e != '\0') {
@@ -142,8 +160,8 @@ std::shared_ptr<ProtoType> BinaryReader::readProto (const std::string &parentSou
     auto p = std::shared_ptr<ProtoType>(
             new ProtoType{
                     source,
-                    this->readUint32(),//source
-                    this->readUint32(),//line
+                    this->readUint32(),//起始行号
+                    this->readUint32(),//终结行号
                     this->readByte(),//numParams
                     this->readByte(),//isVarag
                     this->readByte(),//maxStackSize 寄存器的数量
@@ -157,6 +175,7 @@ std::shared_ptr<ProtoType> BinaryReader::readProto (const std::string &parentSou
                     this->readUpValueNames()
             }
     );
+    return p;
 }
 
 //读取指令表
@@ -182,7 +201,8 @@ interface BinaryReader::readConstant () {
     } else if (b == TAG_NUMBER) {
         f.number = this->readLuaNumber();
     } else if (b == TAG_LONG_STR || b == TAG_SHORT_STR) {
-        f.valStr = this->readString();
+        std::string str = this->readString();
+        f.valStr = str;
     } else if (b == TAG_INTEGER) {
         f.integer = this->readLuaInteger();
     }
@@ -258,3 +278,5 @@ std::vector<std::string> BinaryReader::readUpValueNames () {
     }
     return upValueNames;
 }
+
+

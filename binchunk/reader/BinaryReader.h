@@ -7,9 +7,9 @@
 
 #include <string>
 #include <cassert>
-#include "../BinaryChunk.h"
 #include <vector>
 
+#include "../BinaryChunk.h"
 #include "../../exception/HeaderException.h"
 
 
