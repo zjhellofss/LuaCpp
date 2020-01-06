@@ -1,10 +1,6 @@
-#include <iostream>
-#include "../binchunk/reader/BinaryReader.h"
+#include "../binchunk/reader/BinaryPrinter.h"
 
 int main () {
-    using namespace std;
-    BinaryReader reader("/Users/fss/CLionProjects/Luacpp/test/luac.out");
-    reader.checkReader();
-    reader.readByte();
-    reader.readProto("");
+    printBinary("/Users/fss/CLionProjects/Luacpp/test/luac.out");
+    return 0;
 }

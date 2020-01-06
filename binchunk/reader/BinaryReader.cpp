@@ -1,23 +1,5 @@
 #include "BinaryReader.h"
-
-//chunk文件头部的签名常量
-const std::string LUA_SIGNATURE("\x1bLua");
-//...的版本号
-byte LUAC_VERSION = 0x53;
-//...的格式号
-byte LUAC_FORMAT = 0x00;
-
-const std::string LUAC_DATA("\x19\x93\r\n\x1a\n");
-
-byte CINT_SIZE = 4;
-byte INSTRUCTION_SIZE = 4;
-byte CSIZET_SIZE = 8;
-byte LUA_INTEGER_SIZE = 8;
-byte LUA_NUMBER_SIZE = 8;
-
-uint32 LUAC_INT = 0x5678;
-const double LUAC_NUM = 370.5;
-
+#include "../BinaryChunk.h"
 
 byte BinaryReader::readByte () {
     byte b = bytes[pos];
@@ -47,6 +29,7 @@ uint32 BinaryReader::readUint32 () {
     auto i = reinterpret_cast<uint32 *>(data);
     return *i;
 }
+
 
 
 uint64_t BinaryReader::readUint64 () {
@@ -190,9 +173,9 @@ std::vector<uint32> BinaryReader::readCode () {
 }
 
 //读取常量
-interface BinaryReader::readConstant () {
+Interface BinaryReader::readConstant () {
     byte b = this->readByte();
-    interface f;
+    Interface f;
     f.type = b;
     if (b == TAG_NIL) {
     } else if (b == TAG_BOOLEAN) {
@@ -209,9 +192,9 @@ interface BinaryReader::readConstant () {
     return f;
 }
 
-std::vector<interface> BinaryReader::readConstants () {
+std::vector<Interface> BinaryReader::readConstants () {
     size_t size = this->readUint32();
-    std::vector<interface> interfaces;
+    std::vector<Interface> interfaces;
     interfaces.reserve(size);
     for (int i = 0; i < size; ++i) {
         interfaces.push_back(this->readConstant());

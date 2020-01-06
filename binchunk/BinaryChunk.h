@@ -15,6 +15,24 @@ using uint32 = unsigned int;
 #define TAG_INTEGER  0x13
 #define TAG_SHORT_STR  0x04
 #define TAG_LONG_STR  0x14
+#define CINT_SIZE  4
+#define INSTRUCTION_SIZE 4
+#define CSIZET_SIZE  8
+#define LUA_INTEGER_SIZE  8
+#define LUA_NUMBER_SIZE 8
+
+//chunk文件头部的签名常量
+#define LUA_SIGNATURE "\x1bLua"
+//...的版本号
+#define LUAC_VERSION  0x53
+//...的格式号
+#define LUAC_FORMAT  0x00
+#define LUAC_DATA "\x19\x93\r\n\x1a\n"
+
+
+#define LUAC_INT 0x5678
+#define LUAC_NUM  370.5
+
 
 //chunk的头部
 struct Header {
@@ -56,10 +74,8 @@ union val {
     double number;
 };
 
-struct interface {
-public:
+struct Interface {
     int type;
-public:
     bool boolean;
     int byteVal;
     double number;
@@ -76,7 +92,7 @@ struct ProtoType {
     //最大寄存器数量
     byte maxStackSize;
     std::vector<uint32> code;
-    std::vector<interface> constants;
+    std::vector<Interface> constants;
     std::vector<Upvalue> upvalues;
     std::vector<std::shared_ptr<ProtoType>> protos;
     //debug information
@@ -85,7 +101,7 @@ struct ProtoType {
     std::vector<std::string> upvalueNames;
 
     ProtoType (std::string source, uint32 lineDefined, uint32 lastLineDefined, byte numParams, byte isVarag,
-               byte maxStackSize, const std::vector<uint32> &code, const std::vector<interface> &constants,
+               byte maxStackSize, const std::vector<uint32> &code, const std::vector<Interface> &constants,
                std::vector<Upvalue> upvalues, const std::vector<std::shared_ptr<ProtoType>> &protos,
                std::vector<uint32> lineInfo, const std::vector<LocVal> &locVar,
                std::vector<std::string> upvalueNames) : source(std::move(source)), lineDefined(lineDefined),

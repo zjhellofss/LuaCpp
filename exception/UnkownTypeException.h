@@ -12,7 +12,7 @@ class UnkownTypeException : public std::exception {
 public:
     explicit UnkownTypeException (std::string s) : s(std::move(s)) {}
 
-    UnkownTypeException () {}
+    UnkownTypeException () = default;
 
     const char *what () const noexcept override {
         return s.data();

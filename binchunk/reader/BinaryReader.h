@@ -29,6 +29,8 @@ public:
 
     uint32 readUint32 ();
 
+    uint32 readUint32Code ();
+
     uint64_t readUint64 ();
 
     int64_t readLuaInteger ();
@@ -43,9 +45,9 @@ public:
 
     std::vector<uint32> readCode ();
 
-    interface readConstant ();
+    Interface readConstant ();
 
-    std::vector<interface> readConstants ();
+    std::vector<Interface> readConstants ();
 
     std::vector<Upvalue> readUpValues ();
 
