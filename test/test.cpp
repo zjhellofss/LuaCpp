@@ -3,7 +3,8 @@
 
 int main () {
     using namespace std;
-    BinaryReader read("/Users/fss/CLionProjects/Luacpp/test/luac.out");
-    read.checkReader();
-    return 0 ;
+    BinaryReader reader("/Users/fss/CLionProjects/Luacpp/test/luac.out");
+    reader.checkReader();
+    reader.readByte();
+    reader.readProto("");
 }
