@@ -86,50 +86,50 @@ void BinaryReader::checkReader () {
     std::string signature = std::string(reinterpret_cast<char *const>(this->readBytes(4).data()));
     if (signature != LUA_SIGNATURE) {
         // luac文件签名不一致的情况
-        throw HeaderException("signature error");
+        throw std::range_error("signature error");
     }
     byte version = this->readByte();
     if (version != LUAC_VERSION) {
         // luac版本号不一致
-        throw HeaderException("version error");
+        throw std::range_error("version error");
     }
     byte format = this->readByte();
     if (format != LUAC_FORMAT) {
-        throw HeaderException("format error");
+        throw std::range_error("format error");
     }
     std::string ldata = std::string(reinterpret_cast<char *const>( this->readBytes(6).data()));
     if (ldata != LUAC_DATA) {
         // lua中固定的字符串不一致
-        throw HeaderException("ldata error");
+        throw std::range_error("ldata error");
     }
     byte cintSize = this->readByte();
     if (cintSize != CINT_SIZE) {
         // lua中cint值的大小
-        throw HeaderException("cint error");
+        throw std::range_error("cint error");
     }
     byte cstSize = this->readByte();
     if (cstSize != CSIZET_SIZE) {
-        throw HeaderException("csize error");
+        throw std::range_error("csize error");
     }
     byte instSize = this->readByte();
     if (instSize != INSTRUCTION_SIZE) {
-        throw HeaderException("instSize error");
+        throw std::range_error("instSize error");
     }
     byte integerSize = this->readByte();
     if (integerSize != LUA_INTEGER_SIZE) {
-        throw HeaderException("integer error");
+        throw std::range_error("integer error");
     }
     byte numberSize = this->readByte();
     if (numberSize != LUA_NUMBER_SIZE) {
-        throw HeaderException("number error");
+        throw std::range_error("number error");
     }
     int64_t luacInt = this->readLuaInteger();
     if (luacInt != LUAC_INT) {
-        throw HeaderException("luacInt error");
+        throw std::range_error("luacInt error");
     }
     double luacNum = this->readLuaNumber();
     if (luacNum - LUAC_NUM > 1e-6) {
-        throw HeaderException("luacNum error");
+        throw std::range_error("luacNum error");
     }
 
 }

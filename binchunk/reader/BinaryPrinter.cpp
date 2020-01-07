@@ -1,7 +1,6 @@
 #include "BinaryReader.h"
 #include "BinaryPrinter.h"
 #include "../BinaryChunk.h"
-#include "../../exception/UnkownTypeException.h"
 #include "../Opcode.h"
 
 #include <cstdio>
@@ -40,7 +39,7 @@ std::string constantToString (Interface *inst) {
     } else if (t == TAG_LONG_STR || t == TAG_SHORT_STR) {
         return std::string(*(std::string *) inst->val);
     } else {
-        throw UnkownTypeException("Unkown type exception");
+        throw std::logic_error("Unkown type exception");
     }
 }
 

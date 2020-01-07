@@ -5,7 +5,6 @@
 
 #include <string>
 #include <vector>
-#include "../exception/UnkownTypeException.h"
 
 using byte = unsigned char;
 using uint32 = unsigned int;

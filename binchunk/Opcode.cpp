@@ -87,19 +87,19 @@ std::tuple<int, int> AsBx (uint32 instruction) {
 }
 
 std::string opName (uint32 instruction) {
-    return OpcodeStructVec[getOpcode(instruction)].name;
+    return OpcodeStructVec[getOpcode(instruction)].getName();
 }
 
 byte opMode (uint32 instruction) {
-    return OpcodeStructVec[getOpcode(instruction)].opMode;
+    return OpcodeStructVec[getOpcode(instruction)].getOpMode();
 }
 
 
 byte bMode (uint32 instruction) {
-    return OpcodeStructVec[getOpcode(instruction)].argBMode;
+    return OpcodeStructVec[getOpcode(instruction)].getArgBMode();
 }
 
 byte cMode (uint32 instruction) {
-    return OpcodeStructVec[getOpcode(instruction)].argCMode;
+    return OpcodeStructVec[getOpcode(instruction)].getArgCMode();
 }
 

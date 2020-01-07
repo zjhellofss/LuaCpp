@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "../BinaryChunk.h"
-#include "../../exception/HeaderException.h"
 
 
 struct BinaryReader {
