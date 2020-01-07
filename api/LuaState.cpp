@@ -41,8 +41,7 @@ void LuaState::replace (int idx) {
 void LuaState::rotate (int idx, int n) {
     idx = this->absIndex(idx);
     if (this->luaStack.isValid(idx)) {
-        auto stk = this->luaStack.stk;
-        this->printLuaState();
+        auto &stk = this->luaStack.stk;
         auto p = stk.begin() + idx;
         if (std::abs(n) == 1) {
             if (n == 1) {
@@ -51,11 +50,11 @@ void LuaState::rotate (int idx, int n) {
                 std::__rotate_left(p, stk.end());
             }
         }
-        printLuaState();
     }
 }
 
 void LuaState::insert (int idx) {
+    idx -= 1;
     idx = this->absIndex(idx);
     if (this->luaStack.isValid(idx)) {
         this->rotate(idx, 1);
