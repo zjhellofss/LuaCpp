@@ -10,7 +10,7 @@
 
 void printHeader (ProtoType *f) ;
 
-std::string constantToString (const Interface &inst);
+std::string constantToString (Interface *inst);
 
 std::string upValName (ProtoType *f, int idx);
 

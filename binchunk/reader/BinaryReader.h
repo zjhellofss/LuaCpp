@@ -45,9 +45,9 @@ public:
 
     std::vector<uint32> readCode ();
 
-    Interface readConstant ();
+    Interface* readConstant ();
 
-    std::vector<Interface> readConstants ();
+    std::vector<Interface*> readConstants ();
 
     std::vector<Upvalue> readUpValues ();
 

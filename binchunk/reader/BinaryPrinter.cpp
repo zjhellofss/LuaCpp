@@ -25,20 +25,20 @@ void printHeader (ProtoType *f) {
 }
 
 
-std::string constantToString (const Interface &inst) {
-    int t = inst.type;
+std::string constantToString (Interface *inst) {
+    int t = inst->type;
     if (t == TAG_NIL) {
         return "";
     } else if (t == TAG_BOOLEAN) {//boolean
-        if (inst.boolean) {
+        if (*((bool *) (inst->val))) {
             return "true";
         } else {
             return "false";
         }
     } else if (t == TAG_INTEGER) {//integer
-        return std::to_string(inst.integer);
+        return std::to_string(*((int *) inst->val));
     } else if (t == TAG_LONG_STR || t == TAG_SHORT_STR) {
-        return inst.valStr;
+        return std::string(*(std::string *) inst->val);
     } else {
         throw UnkownTypeException("Unkown type exception");
     }
@@ -56,7 +56,7 @@ void printDetial (ProtoType *f) {
     size_t s1 = f->constants.size();
     printf("constants (%ld):\n", s1);
     for (auto i = 0; i < s1; ++i) {
-        Interface it = f->constants[i];
+        Interface *it = f->constants[i];
         printf("\t%d\t%s\n", i + 1, constantToString(it).data());
     }
 
@@ -84,7 +84,6 @@ std::shared_ptr<ProtoType> undump (const std::string &path) {
     reader.readByte();
     return reader.readProto("");
 }
-
 
 
 void printBinary (const std::string &path) {

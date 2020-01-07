@@ -31,7 +31,6 @@ uint32 BinaryReader::readUint32 () {
 }
 
 
-
 uint64_t BinaryReader::readUint64 () {
     std::vector<byte> vec = readBytes(8);
     auto e = vec.begin();
@@ -173,28 +172,28 @@ std::vector<uint32> BinaryReader::readCode () {
 }
 
 //读取常量
-Interface BinaryReader::readConstant () {
+Interface *BinaryReader::readConstant () {
     byte b = this->readByte();
-    Interface f;
-    f.type = b;
+    Interface *f = new Interface;
+    f->type = b;
     if (b == TAG_NIL) {
     } else if (b == TAG_BOOLEAN) {
         byte v = this->readByte();
-        f.boolean = (v != 0);
+        f->val = new bool((v != 0));
     } else if (b == TAG_NUMBER) {
-        f.number = this->readLuaNumber();
+        f->val = new double(this->readLuaNumber());
     } else if (b == TAG_LONG_STR || b == TAG_SHORT_STR) {
         std::string str = this->readString();
-        f.valStr = str;
+        f->val = new std::string(str);
     } else if (b == TAG_INTEGER) {
-        f.integer = this->readLuaInteger();
+        f->val = new int(this->readLuaInteger());
     }
     return f;
 }
 
-std::vector<Interface> BinaryReader::readConstants () {
+std::vector<Interface *> BinaryReader::readConstants () {
     size_t size = this->readUint32();
-    std::vector<Interface> interfaces;
+    std::vector<Interface *> interfaces;
     interfaces.reserve(size);
     for (int i = 0; i < size; ++i) {
         interfaces.push_back(this->readConstant());

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include "../exception/UnkownTypeException.h"
 
 using byte = unsigned char;
 using uint32 = unsigned int;
@@ -76,11 +77,21 @@ union val {
 
 struct Interface {
     int type;
-    bool boolean;
-    int byteVal;
-    double number;
-    int64_t integer;
-    std::string valStr;
+    void *val;
+
+    virtual ~Interface () {
+        if (type == TAG_BOOLEAN) {
+            delete (int *) val;
+        } else if (type == TAG_SHORT_STR || type == TAG_LONG_STR) {
+            delete (std::string *) val;
+        } else if (type == TAG_INTEGER) {
+            delete (int *) val;
+        } else if (type == TAG_NUMBER) {
+            delete (double *) val;
+        } else {
+
+        }
+    }
 };
 
 struct ProtoType {
@@ -92,7 +103,7 @@ struct ProtoType {
     //最大寄存器数量
     byte maxStackSize;
     std::vector<uint32> code;
-    std::vector<Interface> constants;
+    std::vector<Interface *> constants;
     std::vector<Upvalue> upvalues;
     std::vector<std::shared_ptr<ProtoType>> protos;
     //debug information
@@ -101,7 +112,7 @@ struct ProtoType {
     std::vector<std::string> upvalueNames;
 
     ProtoType (std::string source, uint32 lineDefined, uint32 lastLineDefined, byte numParams, byte isVarag,
-               byte maxStackSize, const std::vector<uint32> &code, const std::vector<Interface> &constants,
+               byte maxStackSize, const std::vector<uint32> &code, const std::vector<Interface *> &constants,
                std::vector<Upvalue> upvalues, const std::vector<std::shared_ptr<ProtoType>> &protos,
                std::vector<uint32> lineInfo, const std::vector<LocVal> &locVar,
                std::vector<std::string> upvalueNames) : source(std::move(source)), lineDefined(lineDefined),
@@ -110,7 +121,15 @@ struct ProtoType {
                                                         constants(constants), upvalues(std::move(upvalues)),
                                                         protos(protos),
                                                         lineInfo(std::move(lineInfo)), locVar(locVar),
+
                                                         upvalueNames(std::move(upvalueNames)) {}
+
+    virtual ~ProtoType () {
+        for (int i = 0; i < this->constants.size(); ++i) {
+            Interface *f = this->constants[i];
+            delete f;
+        }
+    }
 };
 
 struct BinaryChunk {
