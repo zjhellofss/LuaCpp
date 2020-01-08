@@ -15,29 +15,29 @@ LuaValue::LuaValue () : type(NIL_TYPE), val(nullptr) {
 LuaValue::LuaValue (int type, void *val) : type(type), val(val) {}
 
 LuaValue::LuaValue (const LuaValue &luaValue) {
-    this->type = luaValue.type;
+    this->type = luaValue.getType();
     switch (type) {
         case NIL_TYPE: {
             this->val = nullptr;
             break;
         }
         case BOOL_TYPE: {
-            bool b = *reinterpret_cast<bool *> (luaValue.val);
+            bool b = *reinterpret_cast<bool *> (luaValue.getVal());
             this->val = new bool(b);
             break;
         }
         case INT_TYPE: {
-            int64_t v = *reinterpret_cast<int64_t *>(luaValue.val);
+            int64_t v = *reinterpret_cast<int64_t *>(luaValue.getVal());
             this->val = new int(v);
             break;
         }
         case DOUBLE_TYPE: {
-            double v = *reinterpret_cast<double *>(luaValue.val);
+            double v = *reinterpret_cast<double *>(luaValue.getVal());
             this->val = new double(v);
             break;
         }
         case STRING_TYPE: {
-            std::string v = *reinterpret_cast<std::string *>(luaValue.val);
+            std::string v = *reinterpret_cast<std::string *>(luaValue.getVal());
             this->val = new std::string(v);
             break;
         }
@@ -77,8 +77,24 @@ std::pair<int64_t, bool> LuaValue::convertToInteger () {
     }
 }
 
+int LuaValue::getType () const {
+    return type;
+}
+
+void LuaValue::setType (int type) {
+    LuaValue::type = type;
+}
+
+void *LuaValue::getVal () const {
+    return val;
+}
+
+void LuaValue::setVal (void *val) {
+    LuaValue::val = val;
+}
+
 LuaStateType typeOf (LuaValue luaValue) {
-    switch (luaValue.type) {
+    switch (luaValue.getType()) {
         case NIL_TYPE:
             return LUA_TNIL;
         case BOOL_TYPE:
@@ -95,12 +111,12 @@ LuaStateType typeOf (LuaValue luaValue) {
 }
 
 bool _le (LuaValue &a, LuaValue &b) {
-    int t1 = a.type;
-    int t2 = b.type;
+    int t1 = a.getType();
+    int t2 = b.getType();
     if (t1 == STRING_TYPE) {
         if (t2 == STRING_TYPE) {
-            auto s1 = *(reinterpret_cast<std::string *>(a.val));
-            auto s2 = *(reinterpret_cast<std::string *>(b.val));
+            auto s1 = *(reinterpret_cast<std::string *>(a.getVal()));
+            auto s2 = *(reinterpret_cast<std::string *>(b.getVal()));
             return s1 < s2;
         }
     } else if (t1 == INT_TYPE || t1 == DOUBLE_TYPE) {
@@ -119,12 +135,12 @@ bool _le (LuaValue &a, LuaValue &b) {
 }
 
 bool _lt (LuaValue &a, LuaValue &b) {
-    int t1 = a.type;
-    int t2 = b.type;
+    int t1 = a.getType();
+    int t2 = b.getType();
     if (t1 == STRING_TYPE) {
         if (t2 == STRING_TYPE) {
-            auto s1 = *(reinterpret_cast<std::string *>(a.val));
-            auto s2 = *(reinterpret_cast<std::string *>(b.val));
+            auto s1 = *(reinterpret_cast<std::string *>(a.getVal()));
+            auto s2 = *(reinterpret_cast<std::string *>(b.getVal()));
             return s1 < s2;
         }
     } else if (t1 == INT_TYPE || t1 == DOUBLE_TYPE) {
@@ -144,20 +160,20 @@ bool _lt (LuaValue &a, LuaValue &b) {
 }
 
 bool _eq (LuaValue &a, LuaValue &b) {
-    int t1 = a.type;
-    int t2 = b.type;
+    int t1 = a.getType();
+    int t2 = b.getType();
     if (t1 == NIL_TYPE) {
-        return b.type == NIL_TYPE;
+        return b.getType() == NIL_TYPE;
     } else if (t1 == BOOL_TYPE) {
         if (t2 == BOOL_TYPE) {
-            auto b1 = *(reinterpret_cast<bool *>(a.val));
-            auto b2 = *(reinterpret_cast<bool *>(b.val));
+            auto b1 = *(reinterpret_cast<bool *>(a.getVal()));
+            auto b2 = *(reinterpret_cast<bool *>(b.getVal()));
             return b1 == b2;
         }
     } else if (t1 == STRING_TYPE) {
         if (t2 == STRING_TYPE) {
-            auto s1 = *(reinterpret_cast<std::string *>(a.val));
-            auto s2 = *(reinterpret_cast<std::string *>(b.val));
+            auto s1 = *(reinterpret_cast<std::string *>(a.getVal()));
+            auto s2 = *(reinterpret_cast<std::string *>(b.getVal()));
             return s1 == s2;
         }
     } else if (t1 == INT_TYPE || t1 == DOUBLE_TYPE) {
@@ -208,3 +224,4 @@ LuaValue _arith (LuaValue &a, LuaValue &b, const Operator &op) {
     }
     return LuaValue{};
 }
+

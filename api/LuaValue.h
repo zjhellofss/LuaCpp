@@ -56,10 +56,15 @@ enum LuaValueCompare {
 };
 
 
-struct Operator {
+class Operator {
+public:
     int64_t (*integerFunc) (int64_t, int64_t);
 
     double (*floatFunc  ) (double, double);
+
+    Operator (int64_t (*integerFunc) (int64_t, int64_t), double (*floatFunc) (double, double)) : integerFunc(
+            integerFunc), floatFunc(floatFunc) {}
+
 };
 
 //对于LuaValue的操作
@@ -148,11 +153,19 @@ inline int64_t bnot (int64_t a, int64_t b) {
 }
 
 
-struct LuaValue {
-public:
+class LuaValue {
+private:
     int type = NIL_TYPE;
     void *val = nullptr;
 public:
+    int getType () const;
+
+    void setType (int type);
+
+    void *getVal () const;
+
+    void setVal (void *val);
+
     LuaValue ();
 
     LuaValue (int type, void *val);

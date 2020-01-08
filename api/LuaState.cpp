@@ -133,7 +133,7 @@ void LuaState::pushString (std::string s) {
 std::string LuaState::typeName (const LuaStateType &type) {
     switch (type) {
         case LUA_TNONE:
-            return "no value";
+            return "no .getVal()ue";
         case LUA_TNIL:
             return "nil";
         case LUA_TBOOLEAN:
@@ -180,23 +180,23 @@ bool LuaState::isBoolean (int idx) {
 }
 
 bool LuaState::isString (int idx) {
-    int type = this->luaStack.get(idx).type;
+    int type = this->luaStack.get(idx).getType();
     return type == LUA_TSTRING || type == LUA_TNUMBER;
 }
 
 bool LuaState::isInteger (int idx) {
     auto v = this->luaStack.get(idx);
-    int t = v.type;
+    int t = v.getType();
     return t == LUA_TINTEGER;
 }
 
 bool LuaState::toBoolean (int idx) {
     auto v = this->luaStack.get(idx);
-    int type = v.type;
+    int type = v.getType();
     if (type == LUA_TNIL || type == LUA_TNONE) {
         return false;
     } else if (type == LUA_TBOOLEAN) {
-        bool b = *reinterpret_cast<bool *>( v.val);
+        bool b = *reinterpret_cast<bool *>( v.getVal());
         return b;
     } else {
         return true;
@@ -205,7 +205,7 @@ bool LuaState::toBoolean (int idx) {
 
 double LuaState::toNumber (int idx) {
     auto v = this->luaStack.get(idx);
-    int type = v.type;
+    int type = v.getType();
     assert(type == INT_TYPE || type == DOUBLE_TYPE);
     auto res = v.convertToFloat();
     bool f = res.second;
@@ -218,7 +218,7 @@ double LuaState::toNumber (int idx) {
 
 int64_t LuaState::toInteger (int idx) {
     auto v = this->luaStack.get(idx);
-    int type = v.type;
+    int type = v.getType();
     assert(type == INT_TYPE);
     auto res = v.convertToInteger();
     bool f = res.second;
@@ -231,12 +231,12 @@ int64_t LuaState::toInteger (int idx) {
 
 std::string LuaState::toString (int idx) {
     auto v = this->luaStack.get(idx);
-    if (v.type == STRING_TYPE) {
-        return std::string(*reinterpret_cast<std::string *> (v.val));
-    } else if (v.type == INT_TYPE) {
-        return std::to_string(*reinterpret_cast<int *>(v.val));
-    } else if (v.type == DOUBLE_TYPE) {
-        return std::to_string(*reinterpret_cast<double *> (v.val));
+    if (v.getType() == STRING_TYPE) {
+        return std::string(*reinterpret_cast<std::string *> (v.getVal()));
+    } else if (v.getType() == INT_TYPE) {
+        return std::to_string(*reinterpret_cast<int *>(v.getVal()));
+    } else if (v.getType() == DOUBLE_TYPE) {
+        return std::to_string(*reinterpret_cast<double *> (v.getVal()));
     } else {
         return "";
     }
@@ -269,10 +269,10 @@ void LuaState::printLuaState () {
 
 void LuaState::len (int idx) {
     auto v = this->luaStack.get(idx);
-    if (v.type != STRING_TYPE) {
+    if (v.getType() != STRING_TYPE) {
         throw std::runtime_error("length error");
     } else {
-        size_t l = ((std::string *) (v.val))->size();
+        size_t l = ((std::string *) (v.getVal()))->size();
         this->luaStack.push(LuaValue(INT_TYPE, new int64_t(l)));
     }
 }
@@ -305,7 +305,7 @@ bool LuaState::compare (int idx1, int idx2, LuaValueCompare luaValueCompare) {
     } else if (luaValueCompare == LUA_OPLE) {
         return _le(a, b);
     } else {
-        throw std::runtime_error("invalid compare");
+        throw std::runtime_error("in compare");
     }
 }
 
@@ -321,7 +321,7 @@ void LuaState::Arith (LuaValueOperator op1) {
     }
     auto op = operators[op1];
     auto res = _arith(a, b, op);
-    if (!res.val && res.type == NIL_TYPE) {
+    if (!res.getVal() && res.getType() == NIL_TYPE) {
         throw std::runtime_error("arithmetic error!");
     } else {
         this->luaStack.push(res);

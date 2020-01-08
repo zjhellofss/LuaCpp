@@ -11,11 +11,14 @@
 
 #include "LuaValue.h"
 
-struct LuaStack {
-public:
+class LuaState;
+
+class LuaStack {
+private:
     std::deque<LuaValue> stk;
 
 public:
+    friend class LuaState;
 
     void check (int n) {
         //检查Luastack是否还可以容纳n个值
@@ -67,7 +70,7 @@ public:
     }
 };
 
-struct LuaState {
+class LuaState {
 public:
     LuaValue getTop ();
 
