@@ -190,14 +190,26 @@ double LuaState::toNumber (int idx) {
     auto v = this->luaStack.get(idx);
     int type = v.type;
     assert(type == INT_TYPE || type == DOUBLE_TYPE);
-    return (*(double *) v.val);
+    auto res = v.convertToFloat();
+    bool f = res.second;
+    if (f) {
+        return res.first;
+    } else {
+        throw std::logic_error("toNumber");
+    }
 }
 
 int LuaState::toInteger (int idx) {
     auto v = this->luaStack.get(idx);
     int type = v.type;
     assert(type == INT_TYPE);
-    return *((int *) v.val);
+    auto res = v.convertToInteger();
+    bool f = res.second;
+    if (f) {
+        return res.first;
+    } else {
+        throw std::logic_error("toInteger");
+    }
 }
 
 std::string LuaState::toString (int idx) {

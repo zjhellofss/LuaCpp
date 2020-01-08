@@ -21,7 +21,7 @@ int64_t shiftLeft (int64_t a, int64_t n);
 
 int64_t iMod (int64_t a, int64_t b);
 
-int64_t Fmod (int64_t a, int64_t b);
+double fMod (double a, double b);
 
 std::pair<int64_t, bool> floatToInteger (double val);
 

@@ -24,7 +24,7 @@ LuaValue::LuaValue (const LuaValue &luaValue) {
             break;
         }
         case INT_TYPE: {
-            int v = *reinterpret_cast<int *>(luaValue.val);
+            int64_t v = *reinterpret_cast<int64_t *>(luaValue.val);
             this->val = new int(v);
             break;
         }
@@ -45,29 +45,29 @@ LuaValue::LuaValue (const LuaValue &luaValue) {
 }
 
 
-std::pair<double, bool> LuaValue::convertToFloat (const LuaValue &luaValue) {
-    if (luaValue.type == DOUBLE_TYPE) {
-        double v = *reinterpret_cast<double *>(luaValue.val);
+std::pair<double, bool> LuaValue::convertToFloat () {
+    if (this->type == DOUBLE_TYPE) {
+        double v = *reinterpret_cast<double *>(this->val);
         return {v, true};
-    } else if (luaValue.type == STRING_TYPE) {
-        const std::string &s = *reinterpret_cast<std::string *>(luaValue.val);
+    } else if (this->type == STRING_TYPE) {
+        const std::string &s = *reinterpret_cast<std::string *>(this->val);
         return parseDouble(s);
-    } else if (luaValue.type == INT_TYPE) {
-        double d = *reinterpret_cast<int *>(luaValue.val);
+    } else if (this->type == INT_TYPE) {
+        double d = *reinterpret_cast<int64_t *>(this->val);
         return {d, true};
     } else {
         return {0.0, false};
     }
 }
 
-std::pair<int, bool> LuaValue::convertToInteger (const LuaValue &luaValue) {
-    int t = luaValue.type;
+std::pair<int64_t, bool> LuaValue::convertToInteger () {
+    int t = this->type;
     if (t == INT_TYPE) {
-        return {*reinterpret_cast<int *>(luaValue.val), true};
+        return {*reinterpret_cast<int64_t *>(this->val), true};
     } else if (t == DOUBLE_TYPE) {
-        return floatToInteger(*reinterpret_cast<double *>(luaValue.val));
+        return floatToInteger(*reinterpret_cast<double *>(this->val));
     } else if (t == STRING_TYPE) {
-        const std::string &s = *reinterpret_cast<std::string *>(luaValue.val);
+        const std::string &s = *reinterpret_cast<std::string *>(this->val);
         return parseInteger(s);
     } else {
         return {0, false};

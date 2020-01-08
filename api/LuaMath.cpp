@@ -3,6 +3,7 @@
 //
 
 #include "LuaMath.h"
+
 int64_t iFloorDiv (int64_t a, int64_t b) {
     if ((a > 0 && b > 0) || (a < 0 && b < 0) || a % b == 0) {
         return a / b;
@@ -15,7 +16,6 @@ double FFloorDiv (double a, double b) {
     return std::floor(a / b);
 }
 
-int64_t shiftRight (int64_t a, int64_t n);
 
 int64_t shiftLeft (int64_t a, int64_t n) {
     if (n >= 0) {
@@ -37,8 +37,8 @@ int64_t iMod (int64_t a, int64_t b) {
     return a - iFloorDiv(a, b) * b;
 }
 
-int64_t Fmod (int64_t a, int64_t b) {
-    return static_cast<int64_t>(a - std::floor(a / b) * b);
+double fMod (double a, double b) {
+    return (a - std::floor(a / b) * b);
 }
 
 std::pair<int64_t, bool> floatToInteger (double val) {
