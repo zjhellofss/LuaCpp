@@ -118,51 +118,34 @@ inline int64_t shr (int64_t a, int64_t b) {
     return shiftRight(a, b);
 }
 
-double div (double a, double b) {
+inline double div (double a, double b) {
     return a / b;
 }
 
-int64_t band (int64_t a, int64_t b) {
+inline int64_t band (int64_t a, int64_t b) {
     return a & b;
 }
 
-int64_t bor (int64_t a, int64_t b) {
+inline int64_t bor (int64_t a, int64_t b) {
     return a | b;
 }
 
-int64_t bxor (int64_t a, int64_t b) {
+inline int64_t bxor (int64_t a, int64_t b) {
     return a ^ b;
 }
 
 
-int64_t iunm (int64_t a, int64_t b) {
+inline int64_t iunm (int64_t a, int64_t b) {
     return -a;
 }
 
-double funm (double a, double b) {
+inline double funm (double a, double b) {
     return a;
 }
 
-int64_t bnot (int64_t a, int64_t b) {
+inline int64_t bnot (int64_t a, int64_t b) {
     return ~a;
 }
-
-std::vector<Operator> operators = std::vector<Operator>{
-        Operator{iadd, fadd},
-        Operator{isub, fsub},
-        Operator{imul, fmul},
-        Operator{imod, fmod},
-        Operator{nullptr, pow},
-        Operator{nullptr, div},
-        Operator{iidiv, fidiv},
-        Operator{band, nullptr},
-        Operator{bor, nullptr},
-        Operator{bxor, nullptr},
-        Operator{shl, nullptr},
-        Operator{shr, nullptr},
-        Operator{iunm, funm},
-        Operator{bnot, nullptr},
-};
 
 
 struct LuaValue {
@@ -250,5 +233,13 @@ public:
 
 LuaStateType typeOf (LuaValue luaValue);
 
+LuaValue _arith (LuaValue &a, LuaValue &b, const Operator &op);
+
+bool _lt (LuaValue &a, LuaValue &b);
+
+bool _le (LuaValue &a, LuaValue &b);
+
+
+bool _eq (LuaValue &a, LuaValue &b);
 
 #endif //LUACPP_LUAVALUE_H

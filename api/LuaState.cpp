@@ -4,6 +4,23 @@
 
 #include "LuaState.h"
 
+std::vector<Operator> operators = std::vector<Operator>{
+        Operator{iadd, fadd},
+        Operator{isub, fsub},
+        Operator{imul, fmul},
+        Operator{imod, fmod},
+        Operator{nullptr, pow},
+        Operator{nullptr, div},
+        Operator{iidiv, fidiv},
+        Operator{band, nullptr},
+        Operator{bor, nullptr},
+        Operator{bxor, nullptr},
+        Operator{shl, nullptr},
+        Operator{shr, nullptr},
+        Operator{iunm, funm},
+        Operator{bnot, nullptr},
+};
+
 LuaValue LuaState::getTop () {
     return this->luaStack.stk.back();
 }
@@ -102,7 +119,7 @@ void LuaState::pushBoolean (bool b) {
 }
 
 void LuaState::pushInteger (int v) {
-    this->luaStack.push(LuaValue(INT_TYPE, new int(v)));
+    this->luaStack.push(LuaValue(INT_TYPE, new int64_t(v)));
 }
 
 void LuaState::pushNumber (double v) {
@@ -195,11 +212,11 @@ double LuaState::toNumber (int idx) {
     if (f) {
         return res.first;
     } else {
-        throw std::logic_error("toNumber");
+        throw std::runtime_error("toNumber");
     }
 }
 
-int LuaState::toInteger (int idx) {
+int64_t LuaState::toInteger (int idx) {
     auto v = this->luaStack.get(idx);
     int type = v.type;
     assert(type == INT_TYPE);
@@ -208,7 +225,7 @@ int LuaState::toInteger (int idx) {
     if (f) {
         return res.first;
     } else {
-        throw std::logic_error("toInteger");
+        throw std::runtime_error("toInteger");
     }
 }
 
@@ -239,7 +256,7 @@ void LuaState::printLuaState () {
         } else if (type == LUA_TNUMBER) {
             printf("[%f]", this->toNumber(i));
         } else if (type == LUA_TINTEGER) {
-            printf("[%d]", this->toInteger(i));
+            printf("[%lld]", this->toInteger(i));
         } else if (type == LUA_TSTRING) {
             printf("[%s]", this->toString(i).data());
         } else {
@@ -249,3 +266,64 @@ void LuaState::printLuaState () {
     printf("\n");
 }
 
+
+void LuaState::len (int idx) {
+    auto v = this->luaStack.get(idx);
+    if (v.type != STRING_TYPE) {
+        throw std::runtime_error("length error");
+    } else {
+        size_t l = ((std::string *) (v.val))->size();
+        this->luaStack.push(LuaValue(INT_TYPE, new int64_t(l)));
+    }
+}
+
+void LuaState::concat (int n) {
+    if (!n) {
+        this->luaStack.push(LuaValue(STRING_TYPE, new std::string("")));
+    } else if (n >= 2) {
+        for (int i = 1; i < n; ++i) {
+            if (this->isString(-1) && this->isString(-2)) {
+                auto s1 = this->toString(-2);
+                auto s2 = this->toString(-1);
+                this->luaStack.pop();
+                this->luaStack.pop();
+                this->luaStack.push(LuaValue(STRING_TYPE, new std::string(s1 + s2)));
+            } else {
+                throw std::runtime_error("concat error");
+            }
+        }
+    }
+}
+
+bool LuaState::compare (int idx1, int idx2, LuaValueCompare luaValueCompare) {
+    auto a = this->luaStack.get(idx1);
+    auto b = this->luaStack.get(idx2);
+    if (luaValueCompare == LUA_OPEQ) {
+        return _eq(a, b);
+    } else if (luaValueCompare == LUA_OPLT) {
+        return _lt(a, b);
+    } else if (luaValueCompare == LUA_OPLE) {
+        return _le(a, b);
+    } else {
+        throw std::runtime_error("invalid compare");
+    }
+}
+
+void LuaState::Arith (LuaValueOperator op1) {
+    auto b = this->luaStack.top();
+    this->luaStack.pop();
+    LuaValue a;
+    if (op1 != LUA_OPUNM && op1 != LUA_OPBNOT) {
+        a = this->luaStack.top();
+        this->luaStack.pop();
+    } else {
+        a = b;
+    }
+    auto op = operators[op1];
+    auto res = _arith(a, b, op);
+    if (!res.val && res.type == NIL_TYPE) {
+        throw std::runtime_error("arithmetic error!");
+    } else {
+        this->luaStack.push(res);
+    }
+}

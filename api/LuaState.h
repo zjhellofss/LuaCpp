@@ -8,9 +8,9 @@
 #include <deque>
 #include <string>
 #include <cassert>
-#include "LuaMath.h"
 
 #include "LuaValue.h"
+
 struct LuaStack {
 public:
     std::deque<LuaValue> stk;
@@ -97,7 +97,7 @@ public:
 
     double toNumber (int idx);
 
-    int toInteger (int idx);
+    int64_t toInteger (int idx);
 
     bool isInteger (int idx);
 
@@ -130,6 +130,13 @@ public:
 
     std::string typeName (const LuaStateType &type);
 
+    void len (int idx);
+
+    void concat (int n);
+
+    bool compare (int idx1, int idx2, LuaValueCompare luaValueCompare);
+
+    void Arith (LuaValueOperator op1);
 
 private:
     LuaStack luaStack;

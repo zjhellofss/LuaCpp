@@ -6,6 +6,9 @@
 #include <string>
 #include "LuaMath.h"
 
+
+
+
 LuaValue::LuaValue () : type(NIL_TYPE), val(nullptr) {
 }
 
@@ -89,4 +92,119 @@ LuaStateType typeOf (LuaValue luaValue) {
         default:
             return LUA_UNKOWNTYPE;
     }
+}
+
+bool _le (LuaValue &a, LuaValue &b) {
+    int t1 = a.type;
+    int t2 = b.type;
+    if (t1 == STRING_TYPE) {
+        if (t2 == STRING_TYPE) {
+            auto s1 = *(reinterpret_cast<std::string *>(a.val));
+            auto s2 = *(reinterpret_cast<std::string *>(b.val));
+            return s1 < s2;
+        }
+    } else if (t1 == INT_TYPE || t1 == DOUBLE_TYPE) {
+        if (t2 == INT_TYPE || t2 == DOUBLE_TYPE) {
+            auto v1 = a.convertToFloat();
+            auto v2 = b.convertToFloat();
+            //如_eq表示均转换成功
+            if (v1.second && v2.second) {
+                return v1.first <= v2.first;
+            } else {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
+bool _lt (LuaValue &a, LuaValue &b) {
+    int t1 = a.type;
+    int t2 = b.type;
+    if (t1 == STRING_TYPE) {
+        if (t2 == STRING_TYPE) {
+            auto s1 = *(reinterpret_cast<std::string *>(a.val));
+            auto s2 = *(reinterpret_cast<std::string *>(b.val));
+            return s1 < s2;
+        }
+    } else if (t1 == INT_TYPE || t1 == DOUBLE_TYPE) {
+        if (t2 == INT_TYPE || t2 == DOUBLE_TYPE) {
+            auto v1 = a.convertToFloat();
+            auto v2 = b.convertToFloat();
+            //如_eq表示均转换成功
+            if (v1.second && v2.second) {
+                return v1.first < v2.first;
+            } else {
+                return false;
+            }
+        }
+    }
+    return false;
+
+}
+
+bool _eq (LuaValue &a, LuaValue &b) {
+    int t1 = a.type;
+    int t2 = b.type;
+    if (t1 == NIL_TYPE) {
+        return b.type == NIL_TYPE;
+    } else if (t1 == BOOL_TYPE) {
+        if (t2 == BOOL_TYPE) {
+            auto b1 = *(reinterpret_cast<bool *>(a.val));
+            auto b2 = *(reinterpret_cast<bool *>(b.val));
+            return b1 == b2;
+        }
+    } else if (t1 == STRING_TYPE) {
+        if (t2 == STRING_TYPE) {
+            auto s1 = *(reinterpret_cast<std::string *>(a.val));
+            auto s2 = *(reinterpret_cast<std::string *>(b.val));
+            return s1 == s2;
+        }
+    } else if (t1 == INT_TYPE || t1 == DOUBLE_TYPE) {
+        if (t2 == INT_TYPE || t2 == DOUBLE_TYPE) {
+            auto v1 = a.convertToFloat();
+            auto v2 = b.convertToFloat();
+            if (v1.second && v2.second) {
+                return v1.first == v2.first;
+            } else {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
+LuaValue _arith (LuaValue &a, LuaValue &b, const Operator &op) {
+    if (op.floatFunc == nullptr) {
+        auto p = a.convertToInteger();
+        if (p.second) {
+            auto q = a.convertToInteger();
+            if (q.second) {
+                //产生
+                auto v = op.integerFunc(p.first, q.first);
+                return LuaValue(INT_TYPE, new int64_t(v));
+            }
+        }
+    } else {
+        if (op.integerFunc != nullptr) {
+            auto p = a.convertToInteger();
+            auto q = b.convertToInteger();
+            if (p.second) {
+                if (q.second) {
+                    return LuaValue(INT_TYPE, new int64_t(op.integerFunc(p.first, q.first)));
+                }
+            }
+
+        }
+        //转为double值再进行计算
+        auto p = a.convertToFloat();
+        if (p.second) {
+            auto q = b.convertToFloat();
+            if (q.second) {
+                return LuaValue(DOUBLE_TYPE, new double(op.floatFunc(p.first, q.first)));
+            }
+        }
+
+    }
+    return LuaValue{};
 }
