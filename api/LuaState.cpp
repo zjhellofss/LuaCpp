@@ -236,3 +236,4 @@ void LuaState::printLuaState () {
     }
     printf("\n");
 }
+
