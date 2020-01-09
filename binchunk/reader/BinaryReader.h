@@ -26,9 +26,9 @@ public:
 
     std::vector<byte> readBytes (const int &len);
 
-    uint32 readUint32 ();
+    uint32_t readUint32 ();
 
-    uint32 readUint32Code ();
+    uint32_t readUint32Code ();
 
     uint64_t readUint64 ();
 
@@ -42,7 +42,7 @@ public:
 
     std::shared_ptr<ProtoType> readProto (const std::string &parentSource);
 
-    std::vector<uint32> readCode ();
+    std::vector<uint32_t> readCode ();
 
     Interface* readConstant ();
 
@@ -50,7 +50,7 @@ public:
 
     std::vector<Upvalue> readUpValues ();
 
-    std::vector<uint32> readLineInfo ();
+    std::vector<uint32_t> readLineInfo ();
 
     std::vector<LocVal> readLocVals ();
 
@@ -63,7 +63,7 @@ public:
                                                           pos(0), file(fopen(filePath.data(), "r")) {
         this->file = fopen(filePath.data(), "r");
         fseek(this->file, 0, SEEK_END);
-        this->fileSize = static_cast<uint32>(ftell(this->file));
+        this->fileSize = static_cast<uint32_t>(ftell(this->file));
         fseek(this->file, 0, SEEK_SET);
         bytes = new byte[fileSize];
         fread(bytes, sizeof(byte), this->fileSize,
@@ -72,7 +72,7 @@ public:
 
 private:
     std::string filePath;
-    uint32 fileSize;
+    uint32_t fileSize;
     FILE *file;
     byte *bytes;
     int pos;

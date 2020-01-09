@@ -1,7 +1,7 @@
 #include "BinaryReader.h"
 #include "BinaryPrinter.h"
 #include "../BinaryChunk.h"
-#include "../Opcode.h"
+#include "../instruction.h"
 
 #include <cstdio>
 
@@ -90,7 +90,7 @@ void printBinary (const std::string &path) {
     list(f.get());
 }
 
-void printOperands (uint32 instruction) {
+void printOperands (uint32_t instruction) {
     auto t = opMode(instruction);
     if (t == IABC) {
         int a, b, c;
@@ -139,7 +139,7 @@ void printCode (ProtoType *f) {
             int v = f->lineInfo[pc];
             line = std::to_string(v);
         }
-        uint32 inst = codes[pc];//获取对应的指令
+        uint32_t inst = codes[pc];//获取对应的指令
         printf("\t%d\t[%s]\t%s \t", pc + 1, line.data(), opName(inst).data());
         printOperands(inst);
         printf("\n");

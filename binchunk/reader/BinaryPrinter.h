@@ -20,7 +20,7 @@ std::shared_ptr<ProtoType> undump (const std::string &path);
 
 void printBinary (const std::string &path);
 
-void printOperands (uint32 instruction);
+void printOperands (uint32_t instruction);
 
 void printCode (ProtoType *f);
 

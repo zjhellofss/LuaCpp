@@ -4,7 +4,7 @@
 
 #include "LuaState.h"
 
-std::vector<Operator> operators = std::vector<Operator>{
+const std::vector<Operator> operators = std::vector<Operator>{
         Operator{iadd, fadd},
         Operator{isub, fsub},
         Operator{imul, fmul},
@@ -326,4 +326,17 @@ void LuaState::Arith (LuaValueOperator op1) {
     } else {
         this->luaStack.push(res);
     }
+}
+
+LuaState::LuaState (ProtoType *protoType, int pc) : protoType(protoType), pc(pc) {}
+
+LuaState::~LuaState () {
+    if (this->protoType != nullptr) {
+        delete protoType;
+        this->protoType = nullptr;
+    }
+}
+
+ProtoType *LuaState::getProtoType () const {
+    return protoType;
 }

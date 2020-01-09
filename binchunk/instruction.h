@@ -6,7 +6,7 @@
 #define LUACPP_OPCODE_H
 
 #include "BinaryChunk.h"
-
+#include "../api/LuaVm.h"
 
 const int MAXARG_Bx = (1 << 18) - 1;       // 262143
 const int MAXARG_sBx = (MAXARG_Bx >> 1);
@@ -77,58 +77,62 @@ private:
     byte opMode; // opcode
     std::string name;//操作的名称
 public:
-    byte getTestFlag () const {
+    void (LuaVm::*action)(uint32_t);
+
+public:
+
+    byte getTestFlag() const {
         return testFlag;
     }
 
-    void setTestFlag (byte testFlag) {
+    void setTestFlag(byte testFlag) {
         OpcodeStruct::testFlag = testFlag;
     }
 
-    byte getSetAFlag () const {
+    byte getSetAFlag() const {
         return setAFlag;
     }
 
-    void setSetAFlag (byte setAFlag) {
+    void setSetAFlag(byte setAFlag) {
         OpcodeStruct::setAFlag = setAFlag;
     }
 
-    byte getArgBMode () const {
+    byte getArgBMode() const {
         return argBMode;
     }
 
-    void setArgBMode (byte argBMode) {
+    void setArgBMode(byte argBMode) {
         OpcodeStruct::argBMode = argBMode;
     }
 
-    byte getArgCMode () const {
+    byte getArgCMode() const {
         return argCMode;
     }
 
-    void setArgCMode (byte argCMode) {
+    void setArgCMode(byte argCMode) {
         OpcodeStruct::argCMode = argCMode;
     }
 
-    byte getOpMode () const {
+    byte getOpMode() const {
         return opMode;
     }
 
-    void setOpMode (byte opMode) {
+    void setOpMode(byte opMode) {
         OpcodeStruct::opMode = opMode;
     }
 
-    const std::string &getName () const {
+    const std::string &getName() const {
         return name;
     }
 
-    void setName (const std::string &name) {
+    void setName(const std::string &name) {
         OpcodeStruct::name = name;
     }
 
 public:
-    OpcodeStruct (byte testFlag, byte setAFlag, byte argBMode, byte argCMode, byte opMode,
-                  std::string name) : testFlag(testFlag), setAFlag(setAFlag), argBMode(argBMode),
-                                      argCMode(argCMode), opMode(opMode), name(std::move(name)) {}
+    OpcodeStruct(byte testFlag, byte setAFlag, byte argBMode, byte argCMode, byte opMode, const std::string &name,
+                 void (LuaVm::*action)(uint32_t)) : testFlag(testFlag), setAFlag(setAFlag), argBMode(argBMode),
+                                                    argCMode(argCMode), opMode(opMode), name(name), action(action) {}
 };
 
 
@@ -141,26 +145,26 @@ enum Opmode {
 };
 
 
-uint32 getOpcode (uint32 instruction);
+uint32_t getOpcode(uint32_t instruction);
 
 //获取ABCmode a b c
-std::tuple<int, int, int> ABC (uint32 instruction);
+std::tuple<int, int, int> ABC(uint32_t instruction);
 
 //获取ABXmode a bx
-std::tuple<int, int> ABX (uint32 instruction);
+std::tuple<int, int> ABX(uint32_t instruction);
 
 //获取AXmode中的参数
-int AX (uint32 instruction);
+int AX(uint32_t instruction);
 
-std::tuple<int, int> AsBx (uint32 instruction);
+std::tuple<int, int> AsBx(uint32_t instruction);
 
-std::string opName (uint32 instruction);
+std::string opName(uint32_t instruction);
 
-byte opMode (uint32 instruction);
+byte opMode(uint32_t instruction);
 
-byte bMode (uint32 instruction);
+byte bMode(uint32_t instruction);
 
-byte cMode (uint32 instruction);
+byte cMode(uint32_t instruction);
 
 
 #endif //LUACPP_OPCODE_H

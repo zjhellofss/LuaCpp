@@ -56,17 +56,6 @@ enum LuaValueCompare {
 };
 
 
-class Operator {
-public:
-    int64_t (*integerFunc) (int64_t, int64_t);
-
-    double (*floatFunc  ) (double, double);
-
-    Operator (int64_t (*integerFunc) (int64_t, int64_t), double (*floatFunc) (double, double)) : integerFunc(
-            integerFunc), floatFunc(floatFunc) {}
-
-};
-
 //对于LuaValue的操作
 inline int64_t iadd (int64_t a, int64_t b) {
     return a + b;
@@ -243,6 +232,21 @@ public:
 
     std::pair<double, bool> convertToFloat ();
 };
+
+class Operator {
+private:
+    int64_t (*integerFunc) (int64_t, int64_t);
+
+    double (*floatFunc  ) (double, double);
+
+public:
+    friend LuaValue _arith (LuaValue &a, LuaValue &b, const Operator &op);
+
+    Operator (int64_t (*integerFunc) (int64_t, int64_t), double (*floatFunc) (double, double)) : integerFunc(
+            integerFunc), floatFunc(floatFunc) {}
+
+};
+
 
 LuaStateType typeOf (LuaValue luaValue);
 

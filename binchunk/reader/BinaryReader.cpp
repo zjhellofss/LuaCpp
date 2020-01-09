@@ -14,7 +14,7 @@ std::vector<byte> BinaryReader::readBytes (const int &len) {
 }
 
 
-uint32 BinaryReader::readUint32 () {
+uint32_t BinaryReader::readUint32 () {
     std::vector<byte> vec = readBytes(4);
     auto e = vec.begin();
     for (; e != vec.end(); ++e) {
@@ -26,7 +26,7 @@ uint32 BinaryReader::readUint32 () {
         vec.erase(vec.begin(), e);
     }
     byte *data = vec.data();
-    auto i = reinterpret_cast<uint32 *>(data);
+    auto i = reinterpret_cast<uint32_t *>(data);
     return *i;
 }
 
@@ -161,8 +161,8 @@ std::shared_ptr<ProtoType> BinaryReader::readProto (const std::string &parentSou
 }
 
 //读取指令表
-std::vector<uint32> BinaryReader::readCode () {
-    std::vector<uint32> codes;
+std::vector<uint32_t> BinaryReader::readCode () {
+    std::vector<uint32_t> codes;
     size_t size = this->readUint32();
     codes.reserve(size);
     for (int i = 0; i < size; ++i) {
@@ -214,8 +214,8 @@ std::vector<Upvalue> BinaryReader::readUpValues () {
     return upvalues;
 }
 
-std::vector<uint32> BinaryReader::readLineInfo () {
-    std::vector<uint32> lineInfos;
+std::vector<uint32_t> BinaryReader::readLineInfo () {
+    std::vector<uint32_t> lineInfos;
     size_t size = this->readUint32();
     lineInfos.reserve(size);
     for (int i = 0; i < size; ++i) {
@@ -228,8 +228,8 @@ std::vector<LocVal> BinaryReader::readLocVals () {
     std::vector<LocVal> locVals;
     int size = this->readUint32();
     std::string varName;
-    uint32 startPc;
-    uint32 endPc;
+    uint32_t startPc;
+    uint32_t endPc;
     for (int i = 0; i < size; ++i) {
         varName = this->readString();
         startPc = this->readUint32();

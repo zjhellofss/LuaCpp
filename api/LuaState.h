@@ -10,6 +10,7 @@
 #include <cassert>
 
 #include "LuaValue.h"
+#include "../binchunk/BinaryChunk.h"
 
 class LuaState;
 
@@ -141,9 +142,20 @@ public:
 
     void Arith (LuaValueOperator op1);
 
+
+    virtual ~LuaState ();
+
+public:
+    LuaState (ProtoType *protoType, int pc);
+
+    friend class LuaVm;
+
+    ProtoType *getProtoType () const;
+
 private:
     LuaStack luaStack;
-
+    ProtoType *protoType;
+    int pc;
 };
 
 

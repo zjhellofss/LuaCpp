@@ -7,7 +7,6 @@
 #include <vector>
 
 using byte = unsigned char;
-using uint32 = unsigned int;
 
 #define  TAG_NIL  0x00
 #define TAG_BOOLEAN  0x01
@@ -61,17 +60,11 @@ struct Upvalue {
 
 struct LocVal {
     std::string varName;
-    uint32 startPC;
-    uint32 endPC;
+    uint32_t startPC;
+    uint32_t endPC;
 
-    LocVal (std::string varName, uint32 startPC, uint32 endPC) : varName(std::move(varName)), startPC(startPC),
+    LocVal (std::string varName, uint32_t startPC, uint32_t endPC) : varName(std::move(varName)), startPC(startPC),
                                                                  endPC(endPC) {}
-};
-
-union val {
-    std::string str;
-    uint64_t val;
-    double number;
 };
 
 struct Interface {
@@ -95,25 +88,25 @@ struct Interface {
 
 struct ProtoType {
     std::string source;
-    uint32 lineDefined;
-    uint32 lastLineDefined;
+    uint32_t lineDefined;
+    uint32_t lastLineDefined;
     byte numParams;
     byte isVarag;
     //最大寄存器数量
     byte maxStackSize;
-    std::vector<uint32> code;
+    std::vector<uint32_t> code;
     std::vector<Interface *> constants;
     std::vector<Upvalue> upvalues;
     std::vector<std::shared_ptr<ProtoType>> protos;
     //debug information
-    std::vector<uint32> lineInfo;
+    std::vector<uint32_t> lineInfo;
     std::vector<LocVal> locVar;
     std::vector<std::string> upvalueNames;
 
-    ProtoType (std::string source, uint32 lineDefined, uint32 lastLineDefined, byte numParams, byte isVarag,
-               byte maxStackSize, const std::vector<uint32> &code, const std::vector<Interface *> &constants,
+    ProtoType (std::string source, uint32_t lineDefined, uint32_t lastLineDefined, byte numParams, byte isVarag,
+               byte maxStackSize, const std::vector<uint32_t> &code, const std::vector<Interface *> &constants,
                std::vector<Upvalue> upvalues, const std::vector<std::shared_ptr<ProtoType>> &protos,
-               std::vector<uint32> lineInfo, const std::vector<LocVal> &locVar,
+               std::vector<uint32_t> lineInfo, const std::vector<LocVal> &locVar,
                std::vector<std::string> upvalueNames) : source(std::move(source)), lineDefined(lineDefined),
                                                         lastLineDefined(lastLineDefined), numParams(numParams),
                                                         isVarag(isVarag), maxStackSize(maxStackSize), code(code),
