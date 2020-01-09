@@ -24,24 +24,5 @@ int main () {
     return 0;
 }
 
-#include <map>
-#include <iostream>
-
-class demo {
-public:
-    demo (int a) : a(a) {}
-
-    bool operator< (const demo &demo1) {
-        return this->a < demo1.a;
-    }
-
-    int getA () const {
-        return a;
-    }
-
-private:
-    int a;
-};
-
 
 
