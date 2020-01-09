@@ -6,7 +6,7 @@
 #define LUACPP_OPCODE_H
 
 #include "BinaryChunk.h"
-#include "../api/LuaVm.h"
+#include "../luaStruct/LuaVm.h"
 
 const int MAXARG_Bx = (1 << 18) - 1;       // 262143
 const int MAXARG_sBx = (MAXARG_Bx >> 1);

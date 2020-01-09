@@ -3,7 +3,7 @@
 //
 
 #include "LuaVm.h"
-#include "LuaState.h"
+#include "../luaState/LuaState.h"
 #include "../binchunk/Instruction.h"
 
 extern const std::vector<OpcodeStruct> OpcodeStructVec;

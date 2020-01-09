@@ -1,6 +1,6 @@
 #include "./binchunk/reader/BinaryReader.h"
 #include "./binchunk/reader/BinaryPrinter.h"
-#include "./api/LuaVm.h"
+#include "./luaStruct/LuaVm.h"
 #include "./binchunk/Instruction.h"
 
 int main () {
@@ -21,4 +21,27 @@ int main () {
         }
     }
     delete luaVm;
+    return 0;
 }
+
+#include <map>
+#include <iostream>
+
+class demo {
+public:
+    demo (int a) : a(a) {}
+
+    bool operator< (const demo &demo1) {
+        return this->a < demo1.a;
+    }
+
+    int getA () const {
+        return a;
+    }
+
+private:
+    int a;
+};
+
+
+

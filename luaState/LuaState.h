@@ -9,7 +9,7 @@
 #include <string>
 #include <cassert>
 
-#include "LuaValue.h"
+#include "../luaStruct/LuaValue.h"
 #include "../binchunk/BinaryChunk.h"
 
 class LuaState;

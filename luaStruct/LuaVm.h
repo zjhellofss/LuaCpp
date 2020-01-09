@@ -6,7 +6,7 @@
 #define LUACPP_LUAVM_H
 
 
-#include "LuaState.h"
+#include "../luaState/LuaState.h"
 
 
 class LuaVm {
