@@ -22,7 +22,7 @@ LuaValue::LuaValue (int type, void *val) : type(type) {
             break;
         }
         case INT_TYPE: {
-            int64_t v = *reinterpret_cast<int64_t *>(val);
+            int v = *reinterpret_cast<int *>(val);
             this->val = new int(v);
             break;
         }
@@ -55,7 +55,7 @@ LuaValue::LuaValue (const LuaValue &luaValue) {
             break;
         }
         case INT_TYPE: {
-            int64_t v = *reinterpret_cast<int64_t *>(luaValue.getVal());
+            int  v = *reinterpret_cast<int *>(luaValue.getVal());
             this->val = new int(v);
             break;
         }
@@ -84,7 +84,7 @@ std::pair<double, bool> LuaValue::convertToFloat () {
         const std::string &s = *reinterpret_cast<std::string *>(this->val);
         return parseDouble(s);
     } else if (this->type == INT_TYPE) {
-        double d = *reinterpret_cast<int64_t *>(this->val);
+        double d = *reinterpret_cast<int *>(this->val);
         return {d, true};
     } else {
         return {0.0, false};
@@ -221,7 +221,7 @@ bool _eq (LuaValue a, LuaValue b) {
             return false;
         }
     } else if ((t1 == DOUBLE_TYPE && t2 == INT_TYPE)
-            || (t1 == INT_TYPE && t2 == DOUBLE_TYPE)) {
+               || (t1 == INT_TYPE && t2 == DOUBLE_TYPE)) {
         auto v1 = a.convertToFloat();
         auto v2 = b.convertToFloat();
         if (v1.second && v2.second) {
