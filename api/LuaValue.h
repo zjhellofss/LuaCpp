@@ -174,8 +174,8 @@ public:
                 break;
             }
             case INT_TYPE: {
-                int64_t v = *reinterpret_cast<int64_t *>(luaValue.val);
-                this->val = new int64_t(v);
+                int64_t v = *reinterpret_cast<int *>(luaValue.val);
+                this->val = new int(v);
                 break;
             }
             case DOUBLE_TYPE: {
@@ -209,7 +209,7 @@ public:
                     break;
                 }
                 case INT_TYPE: {
-                    delete reinterpret_cast<int64_t *>(val);
+                    delete reinterpret_cast<int *>(val);
                     break;
                 }
                 case DOUBLE_TYPE: {
@@ -228,7 +228,7 @@ public:
         }
     }
 
-    std::pair<int64_t, bool> convertToInteger ();
+    std::pair<int, bool> convertToInteger ();
 
     std::pair<double, bool> convertToFloat ();
 };
@@ -257,6 +257,6 @@ bool _lt (LuaValue &a, LuaValue &b);
 bool _le (LuaValue &a, LuaValue &b);
 
 
-bool _eq (LuaValue &a, LuaValue &b);
+bool _eq (LuaValue a, LuaValue b);
 
 #endif //LUACPP_LUAVALUE_H

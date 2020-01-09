@@ -34,7 +34,13 @@ int64_t shiftRight (int64_t a, int64_t n) {
 }
 
 int64_t iMod (int64_t a, int64_t b) {
-    return a - iFloorDiv(a, b) * b;
+    int64_t v;
+    if ((a > 0 && b > 0) || (a < 0 && b < 0) || a % b == 0) {
+        v = a / b;
+    } else {
+        v = a / b - 1;
+    }
+    return a - v * b;
 }
 
 double fMod (double a, double b) {

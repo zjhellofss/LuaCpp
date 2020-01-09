@@ -73,6 +73,13 @@ public:
 
 class LuaState {
 public:
+    LuaState (ProtoType *protoType);
+
+public:
+    void setPc (int pc);
+
+    int getPc () const;
+
     LuaValue getTop ();
 
     int absIndex (int idx);

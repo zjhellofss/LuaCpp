@@ -2,9 +2,9 @@
 // Created by fushenshen on 2020/1/6.
 //
 
-#include "instruction.h"
+#include "Instruction.h"
 
-uint32_t getOpcode(uint32_t instruction) {
+uint32_t getOpcode (uint32_t instruction) {
     return instruction & 0x3F;
 }
 
@@ -73,48 +73,52 @@ const std::vector<OpcodeStruct> OpcodeStructVec{
 };
 
 //获取ABCmode a b c
-std::tuple<int, int, int> ABC(uint32_t instruction) {
-    int a = instruction >> 6 & 0xFF;
-    int c = instruction >> 14 & 0x1FF;
-    int b = instruction >> 23 & 0x1FF;
+std::tuple<int, int, int> ABC (uint32_t instruction) {
+    int a = (instruction >> 6) & 0xFF;
+    int c = (instruction >> 14) & 0x1FF;
+    int b = (instruction >> 23) & 0x1FF;
     return std::make_tuple(a, b, c);
 }
 
 
 //获取ABXmode a bx
-std::tuple<int, int> ABX(uint32_t instruction) {
-    int a = instruction >> 6 & 0xFF;
+std::tuple<int, int> ABX (uint32_t instruction) {
+    int a = (instruction >> 6) & 0xFF;
     int bx = instruction >> 14;
     return std::make_tuple(a, bx);
 }
 
-int AX(uint32_t instruction) {
+int AX (uint32_t instruction) {
     return instruction >> 6;
 }
 
-std::tuple<int, int> AsBx(uint32_t instruction) {
+std::tuple<int, int> AsBx (uint32_t instruction) {
     auto t = ABX(instruction);
     return std::make_tuple(std::get<0>(t), std::get<1>(t) - MAXARG_sBx);
 }
 
-std::string opName(uint32_t instruction) {
+std::string opName (uint32_t instruction) {
     return OpcodeStructVec[getOpcode(instruction)].getName();
 }
 
-byte opMode(uint32_t instruction) {
+byte opMode (uint32_t instruction) {
     return OpcodeStructVec[getOpcode(instruction)].getOpMode();
 }
 
 
-byte bMode(uint32_t instruction) {
+byte bMode (uint32_t instruction) {
     return OpcodeStructVec[getOpcode(instruction)].getArgBMode();
 }
 
-byte cMode(uint32_t instruction) {
+byte cMode (uint32_t instruction) {
     return OpcodeStructVec[getOpcode(instruction)].getArgCMode();
 }
 
-void execute(uint32_t instruction, LuaVm *luaVm) {
+void execute (uint32_t instruction, LuaVm *luaVm) {
     auto action = OpcodeStructVec[getOpcode(instruction)].action;
-    return (luaVm->*action)(instruction);
+    if (action != nullptr) {
+        return (luaVm->*action)(instruction);
+    }else {
+        throw std::runtime_error("execute");
+    }
 }

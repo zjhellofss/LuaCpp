@@ -1,7 +1,7 @@
 #include "BinaryReader.h"
 #include "BinaryPrinter.h"
 #include "../BinaryChunk.h"
-#include "../instruction.h"
+#include "../Instruction.h"
 
 #include <cstdio>
 

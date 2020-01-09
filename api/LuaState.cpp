@@ -256,7 +256,7 @@ void LuaState::printLuaState () {
         } else if (type == LUA_TNUMBER) {
             printf("[%f]", this->toNumber(i));
         } else if (type == LUA_TINTEGER) {
-            printf("[%lld]", this->toInteger(i));
+            printf("[%d]", this->toInteger(i));
         } else if (type == LUA_TSTRING) {
             printf("[%s]", this->toString(i).data());
         } else {
@@ -339,4 +339,14 @@ LuaState::~LuaState () {
 
 ProtoType *LuaState::getProtoType () const {
     return protoType;
+}
+
+LuaState::LuaState (ProtoType *protoType) : protoType(protoType), pc(0) {}
+
+int LuaState::getPc () const {
+    return pc;
+}
+
+void LuaState::setPc (int pc) {
+    LuaState::pc = pc;
 }

@@ -4,23 +4,25 @@
 
 #include "LuaVm.h"
 #include "LuaState.h"
-#include "../binchunk/instruction.h"
+#include "../binchunk/Instruction.h"
 
 extern const std::vector<OpcodeStruct> OpcodeStructVec;
 
 //取出当前的指令
-uint32_t LuaVm::fetch() {
+uint32_t LuaVm::fetch () {
     ProtoType *protoType = this->luaState.getProtoType();
-    uint32_t i = protoType->code[this->pc++];
+    uint32_t i = protoType->code[this->Pc()];
+    this->addPc(1);
     return i;
 }
 
 //
-void LuaVm::addPc(int n) {
-    this->pc += n;
+void LuaVm::addPc (int n) {
+    int pc = this->luaState.getPc();
+    this->luaState.setPc(pc + n);
 }
 
-void LuaVm::getConst(int idx) {
+void LuaVm::getConst (int idx) {
     ProtoType *p = this->getProtoType();
     auto c = p->constants[idx];
     int type = c->type;
@@ -41,7 +43,7 @@ void LuaVm::getConst(int idx) {
 }
 
 //将常量值推入栈顶或者将索引值推入到栈中
-void LuaVm::getRk(int rk) {
+void LuaVm::getRk (int rk) {
     if (rk > 0xFF) {
         this->getConst(rk & 0xFF);
     } else {
@@ -49,16 +51,16 @@ void LuaVm::getRk(int rk) {
     }
 }
 
-int LuaVm::Pc() {
-    return this->pc;
+int LuaVm::Pc () {
+    return this->luaState.getPc();
 }
 
 
-ProtoType *LuaVm::getProtoType() {
+ProtoType *LuaVm::getProtoType () {
     return this->luaState.getProtoType();
 }
 
-void LuaVm::move(uint32_t instruction) {
+void LuaVm::move (uint32_t instruction) {
     int a, b;
     std::tie(a, b, std::ignore) = ABC(instruction);
     a += 1;
@@ -66,7 +68,7 @@ void LuaVm::move(uint32_t instruction) {
     this->luaState.copy(b, a);
 }
 
-void LuaVm::jmp(uint32_t instruction) {
+void LuaVm::jmp (uint32_t instruction) {
     int a, b;
     std::tie(a, b) = AsBx(instruction);
     this->addPc(b);
@@ -75,7 +77,7 @@ void LuaVm::jmp(uint32_t instruction) {
     }
 }
 
-void LuaVm::loadNil(uint32_t instruction) {
+void LuaVm::loadNil (uint32_t instruction) {
     int a, b;
     std::tie(a, b, std::ignore) = ABC(instruction);
     a += 1;
@@ -88,7 +90,7 @@ void LuaVm::loadNil(uint32_t instruction) {
     this->luaState.pop(1);
 }
 
-void LuaVm::loadBool(uint32_t instruction) {
+void LuaVm::loadBool (uint32_t instruction) {
     int a, b, c;
     std::tie(a, b, c) = ABC(instruction);
     a += 1;
@@ -100,7 +102,7 @@ void LuaVm::loadBool(uint32_t instruction) {
     }
 }
 
-void LuaVm::loadK(uint32_t instruction) {
+void LuaVm::loadK (uint32_t instruction) {
     int a, bx;
     std::tie(a, bx) = ABX(instruction);
     a += 1;
@@ -109,7 +111,7 @@ void LuaVm::loadK(uint32_t instruction) {
     this->luaState.replace(a);
 }
 
-void LuaVm::loadKx(uint32_t instruction) {
+void LuaVm::loadKx (uint32_t instruction) {
     int a, b;
     std::tie(a, b) = ABX(instruction);
     a += 1;
@@ -118,17 +120,18 @@ void LuaVm::loadKx(uint32_t instruction) {
     this->luaState.replace(a);
 }
 
-void LuaVm::_binaryArith(uint32_t instruction, LuaValueOperator op) {
+void LuaVm::_binaryArith (uint32_t instruction, LuaValueOperator op) {
     int a, b, c;
     std::tie(a, b, c) = ABC(instruction);
     //获取两个常量值
+    a += 1;
     this->getRk(b);
     this->getRk(c);
     this->luaState.Arith(op);
     this->luaState.replace(a);
 }
 
-void LuaVm::_unaryArith(uint32_t instruction, LuaValueOperator op) {
+void LuaVm::_unaryArith (uint32_t instruction, LuaValueOperator op) {
     int a, b;
     std::tie(a, b, std::ignore) = ABC(instruction);
     a += 1;
@@ -138,7 +141,7 @@ void LuaVm::_unaryArith(uint32_t instruction, LuaValueOperator op) {
     this->luaState.replace(a);
 }
 
-void LuaVm::_len(uint32_t instruction) {
+void LuaVm::_len (uint32_t instruction) {
     int a, b;
     std::tie(a, b, std::ignore) = ABC(instruction);
     a += 1;
@@ -147,7 +150,7 @@ void LuaVm::_len(uint32_t instruction) {
     this->luaState.replace(a);
 }
 
-void LuaVm::concat(uint32_t instruction) {
+void LuaVm::concat (uint32_t instruction) {
     int a, b, c;
     std::tie(a, b, c) = ABC(instruction);
     a += 1;
@@ -161,7 +164,7 @@ void LuaVm::concat(uint32_t instruction) {
     this->luaState.replace(a);
 }
 
-void LuaVm::_not(uint32_t instruction) {
+void LuaVm::_not (uint32_t instruction) {
     int a, b;
     std::tie(a, b, std::ignore) = ABC(instruction);
     a += 1;
@@ -170,7 +173,7 @@ void LuaVm::_not(uint32_t instruction) {
     this->luaState.replace(a);
 }
 
-void LuaVm::testSet(uint32_t instruction) {
+void LuaVm::testSet (uint32_t instruction) {
     int a, b, c;
     std::tie(a, b, c) = ABC(instruction);
     a += 1;
@@ -183,7 +186,7 @@ void LuaVm::testSet(uint32_t instruction) {
     }
 }
 
-void LuaVm::test(uint32_t instruction) {
+void LuaVm::test (uint32_t instruction) {
     int a, c;
     std::tie(a, std::ignore, c) = ABC(instruction);
     a += 1;
@@ -193,32 +196,32 @@ void LuaVm::test(uint32_t instruction) {
 }
 
 
-void LuaVm::add(uint32_t instruction) {
+void LuaVm::add (uint32_t instruction) {
     _binaryArith(instruction, LUA_OPADD);// +
 }
 
-void LuaVm::sub(uint32_t instruction) {
+void LuaVm::sub (uint32_t instruction) {
     _binaryArith(instruction, LUA_OPSUB); // -
 }
 
-void LuaVm::mul(uint32_t instruction) {
+void LuaVm::mul (uint32_t instruction) {
     _binaryArith(instruction, LUA_OPMUL);
 }
 
 
-void LuaVm::mod(uint32_t instruction) { _binaryArith(instruction, LUA_OPMOD); }  // %
-void LuaVm::pow(uint32_t instruction) { _binaryArith(instruction, LUA_OPPOW); }  // ^
-void LuaVm::div(uint32_t instruction) { _binaryArith(instruction, LUA_OPDIV); }  // /
-void LuaVm::idiv(uint32_t instruction) { _binaryArith(instruction, LUA_OPIDIV); } // //
-void LuaVm::band(uint32_t instruction) { _binaryArith(instruction, LUA_OPBAND); } // &
-void LuaVm::bor(uint32_t instruction) { _binaryArith(instruction, LUA_OPBOR); }  // |
-void LuaVm::bxor(uint32_t instruction) { _binaryArith(instruction, LUA_OPBXOR); } // ~
-void LuaVm::shl(uint32_t instruction) { _binaryArith(instruction, LUA_OPSHL); }  // <<
-void LuaVm::shr(uint32_t instruction) { _binaryArith(instruction, LUA_OPSHR); }  // >>
-void LuaVm::unm(uint32_t instruction) { _unaryArith(instruction, LUA_OPUNM); }   // -
-void LuaVm::bnot(uint32_t instruction) { _unaryArith(instruction, LUA_OPBNOT); }
+void LuaVm::mod (uint32_t instruction) { _binaryArith(instruction, LUA_OPMOD); }  // %
+void LuaVm::pow (uint32_t instruction) { _binaryArith(instruction, LUA_OPPOW); }  // ^
+void LuaVm::div (uint32_t instruction) { _binaryArith(instruction, LUA_OPDIV); }  // /
+void LuaVm::idiv (uint32_t instruction) { _binaryArith(instruction, LUA_OPIDIV); } // //
+void LuaVm::band (uint32_t instruction) { _binaryArith(instruction, LUA_OPBAND); } // &
+void LuaVm::bor (uint32_t instruction) { _binaryArith(instruction, LUA_OPBOR); }  // |
+void LuaVm::bxor (uint32_t instruction) { _binaryArith(instruction, LUA_OPBXOR); } // ~
+void LuaVm::shl (uint32_t instruction) { _binaryArith(instruction, LUA_OPSHL); }  // <<
+void LuaVm::shr (uint32_t instruction) { _binaryArith(instruction, LUA_OPSHR); }  // >>
+void LuaVm::unm (uint32_t instruction) { _unaryArith(instruction, LUA_OPUNM); }   // -
+void LuaVm::bnot (uint32_t instruction) { _unaryArith(instruction, LUA_OPBNOT); }
 
-void LuaVm::_compare(uint32_t instruction, LuaValueCompare op) {
+void LuaVm::_compare (uint32_t instruction, LuaValueCompare op) {
     int a, b, c;
     std::tie(a, b, c) = ABC(instruction);
     this->getRk(b);
@@ -229,19 +232,19 @@ void LuaVm::_compare(uint32_t instruction, LuaValueCompare op) {
     this->luaState.pop(2);
 }
 
-void LuaVm::eq(uint32_t instruction) {
+void LuaVm::eq (uint32_t instruction) {
     return _compare(instruction, LUA_OPEQ);
 }
 
-void LuaVm::lt(uint32_t instruction) {
+void LuaVm::lt (uint32_t instruction) {
     return _compare(instruction, LUA_OPLT);
 }
 
-void LuaVm::le(uint32_t instruction) {
+void LuaVm::le (uint32_t instruction) {
     return _compare(instruction, LUA_OPLE);
 }
 
-void LuaVm::forPrep(uint32_t instruction) {
+void LuaVm::forPrep (uint32_t instruction) {
     int a, sbx;
     std::tie(a, sbx) = AsBx(instruction);
     a += 1;
@@ -252,7 +255,7 @@ void LuaVm::forPrep(uint32_t instruction) {
     this->addPc(sbx);
 }
 
-void LuaVm::forLoop(uint32_t instruction) {
+void LuaVm::forLoop (uint32_t instruction) {
     int a, sbx;
     std::tie(a, sbx) = AsBx(instruction);
     a += 1;
@@ -266,6 +269,16 @@ void LuaVm::forLoop(uint32_t instruction) {
         this->addPc(sbx);
         this->luaState.copy(a, a + 3);
     }
+}
+
+LuaVm::LuaVm (ProtoType *protoType) : luaState(protoType) {}
+
+void LuaVm::printStack () {
+    return this->luaState.printLuaState();
+}
+
+void LuaVm::setTop (int n) {
+    return this->luaState.setTop(n);
 }
 
 
