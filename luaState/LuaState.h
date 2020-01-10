@@ -71,6 +71,8 @@ public:
     }
 };
 
+class LuaTable;
+
 class LuaState {
 public:
     LuaState (ProtoType *protoType);
@@ -149,6 +151,26 @@ public:
 
     void Arith (LuaValueOperator op1);
 
+
+    void createTable (int nArr, int Rec);
+
+    void newTable ();
+
+    LuaValue getTable (int idx);
+
+    LuaValue getTable_ (LuaTable *t, LuaValue k);
+
+    LuaValue getField (int idx, const std::string &str);
+
+    LuaValue getI (int idx, int i);
+
+    void setTable (int idx);
+
+    void setTable_ (LuaTable *, LuaValue *k, LuaValue *v);
+
+    void setField (int idx, const std::string &str);
+
+    void setI (int idx, int i);
 
     virtual ~LuaState ();
 

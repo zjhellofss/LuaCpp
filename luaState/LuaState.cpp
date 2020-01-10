@@ -3,6 +3,7 @@
 //
 
 #include "LuaState.h"
+#include "../luaStruct/LuaTable.h"
 
 const std::vector<Operator> operators = std::vector<Operator>{
         Operator{iadd, fadd},
@@ -269,11 +270,14 @@ void LuaState::printLuaState () {
 
 void LuaState::len (int idx) {
     auto v = this->luaStack.get(idx);
-    if (v.getType() != STRING_TYPE) {
-        throw std::runtime_error("length error");
-    } else {
+    if (v.getType() == STRING_TYPE) {
         size_t l = ((std::string *) (v.getVal()))->size();
         this->luaStack.push(LuaValue(INT_TYPE, new int64_t(l)));
+    } else if (v.getType() == TABLE_TYPE) {
+        size_t l = reinterpret_cast<LuaTable *>(v.getVal())->arrLen();
+        this->luaStack.push(LuaValue(INT_TYPE, new int(l)));
+    } else {
+        throw std::runtime_error("length error");
     }
 }
 
@@ -350,3 +354,72 @@ int LuaState::getPc () const {
 void LuaState::setPc (int pc) {
     LuaState::pc = pc;
 }
+
+void LuaState::createTable (int nArr, int Rec) {
+    this->luaStack.push(LuaValue{TABLE_TYPE, new LuaTable()});
+}
+
+void LuaState::newTable () {
+    this->createTable(0, 0);
+}
+
+LuaValue LuaState::getTable (int idx) {
+    auto t1 = this->luaStack.get(idx);
+    auto k = this->luaStack.top();
+    this->luaStack.pop();
+    auto table = reinterpret_cast<LuaTable *>(t1.getVal());
+    return this->getTable_(table, k);
+}
+
+LuaValue LuaState::getTable_ (LuaTable *t, LuaValue k) {
+    LuaValue val = *(t->get(&k));
+    return val;
+}
+
+LuaValue LuaState::getField (int idx, const std::string &str) {
+    this->pushString(str);
+    return this->getTable(idx);
+}
+
+LuaValue LuaState::getI (int idx, int i) {
+    LuaValue luaValue = this->luaStack.get(idx);
+    auto *table = reinterpret_cast<LuaTable *>(luaValue.getVal());
+    return this->getTable_(table, LuaValue(INT_TYPE, new int(i)));
+}
+
+void LuaState::setTable (int idx) {
+    LuaTable *luaTable = reinterpret_cast<LuaTable *>(this->luaStack.get(idx).getVal());
+    LuaValue key = this->luaStack.top();
+    this->luaStack.pop();
+    LuaValue value = this->luaStack.top();
+    this->luaStack.pop();
+    return this->setTable_(luaTable,
+                           new LuaValue(key.getType(), key.getVal()), new LuaValue(value.getType(), value.getVal()));
+}
+
+void LuaState::setTable_ (LuaTable *table, LuaValue *k, LuaValue *v) {
+    assert(table != nullptr);
+    return table->put(k, v);
+}
+
+void LuaState::setField (int idx, const std::string &str) {
+    auto *t = reinterpret_cast<LuaTable *>(this->luaStack.get(idx).getVal());
+    auto v = this->luaStack.top();
+    this->luaStack.pop();
+    auto *value = new LuaValue(v);
+    t->put(new LuaValue(STRING_TYPE, new std::string(str)), value);
+}
+
+void LuaState::setI (int idx, int i) {
+    auto *t = reinterpret_cast<LuaTable *>(this->luaStack.get(idx).getVal());
+    auto v_ = this->luaStack.top();
+    auto v = new LuaValue(v_.getType(), v_.getVal());
+    this->setTable_(t, new LuaValue(INT_TYPE, new int(i)), v);
+}
+
+
+
+
+
+
+

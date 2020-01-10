@@ -83,6 +83,8 @@ public:
     void printStack ();
 
     void setTop (int n);
+
+
 };
 
 #endif //LUACPP_LUAVM_H

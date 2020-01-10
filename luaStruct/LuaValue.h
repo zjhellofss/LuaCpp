@@ -7,7 +7,7 @@
 
 #include <string>
 #include <vector>
-
+#include <map>
 #include "LuaMath.h"
 
 //lua中的基础类型
@@ -31,6 +31,7 @@ enum LuaStateType {
 #define INT_TYPE 0X03
 #define DOUBLE_TYPE 0X04
 #define STRING_TYPE 0X05
+#define TABLE_TYPE 0x06
 
 enum LuaValueOperator {
     LUA_OPADD = 0, // +
@@ -141,11 +142,11 @@ inline int64_t bnot (int64_t a, int64_t b) {
     return ~a;
 }
 
-
 class LuaValue {
 private:
     int type = NIL_TYPE;
     void *val = nullptr;
+    //LuaTable 结构专用
 public:
     int getType () const;
 
@@ -161,76 +162,18 @@ public:
 
     LuaValue (const LuaValue &luaValue);
 
-    LuaValue &operator= (const LuaValue &luaValue) {
-        this->type = luaValue.type;
-        switch (type) {
-            case NIL_TYPE: {
-                this->val = nullptr;
-                break;
-            }
-            case BOOL_TYPE: {
-                bool b = *reinterpret_cast<bool *> (luaValue.val);
-                this->val = new bool(b);
-                break;
-            }
-            case INT_TYPE: {
-                int64_t v = *reinterpret_cast<int *>(luaValue.val);
-                this->val = new int(v);
-                break;
-            }
-            case DOUBLE_TYPE: {
-                double v = *reinterpret_cast<double *>(luaValue.val);
-                this->val = new double(v);
-                break;
-            }
-            case STRING_TYPE: {
-                std::string v = *reinterpret_cast<std::string *>(luaValue.val);
-                this->val = new std::string(v);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-        return *this;
-    }
+    LuaValue &operator= (const LuaValue &luaValue);
 
 
-    virtual ~
+    virtual ~ LuaValue ();
 
-    LuaValue () {
-        if (val != nullptr) {
-            switch (type) {
-                case NIL_TYPE: {
-                    break;
-                }
-                case BOOL_TYPE: {
-                    delete reinterpret_cast<bool *>( val);
-                    break;
-                }
-                case INT_TYPE: {
-                    delete reinterpret_cast<int *>(val);
-                    break;
-                }
-                case DOUBLE_TYPE: {
-                    delete reinterpret_cast<double *>(val);
-                    break;
-                }
-                case STRING_TYPE: {
-                    delete reinterpret_cast<std::string *>(val);
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-            val = nullptr;
-        }
-    }
 
-    std::pair<int, bool> convertToInteger ();
+    std::pair<int, bool> convertToInteger () const;
 
-    std::pair<double, bool> convertToFloat ();
+    std::pair<double, bool> convertToFloat () const;
+
+    bool operator< (const LuaValue &rhs) const;
+
 };
 
 class Operator {
